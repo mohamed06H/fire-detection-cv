@@ -62,13 +62,13 @@ jobs:
           sudo yum update -y
           sudo yum install -y docker
           sudo systemctl start docker
-          sudo usermod -a -G docker ec2-user
+          sudo usermod -aG docker ec2-user
           sudo systemctl enable docker
           # Restart Docker to apply group changes
           sudo systemctl restart docker
           # Pull the latest Docker image and deploy
-          docker pull mohamed06/wf_streamlit:latest
-          docker stop streamlit-app || true
-          docker rm streamlit-app || true
-          docker run -d -p 80:8501 --name streamlit-app mohamed06/wf_streamlit:latest
+          sudo docker pull mohamed06/wf_streamlit:latest
+          sudo docker stop streamlit-app || true
+          sudo docker rm streamlit-app || true
+          sudo docker run -d -p 80:8501 --name streamlit-app mohamed06/wf_streamlit:latest
         EOF
