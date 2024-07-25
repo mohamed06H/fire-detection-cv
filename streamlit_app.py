@@ -39,19 +39,45 @@ def load_model(model_name, stage='Production'):
 model_name = 'fire_detection_yolo'
 model = load_model(model_name)
 
-
 # Title of the Streamlit app
 st.title("Fire Detection using YOLO")
 
-# Upload video file
-uploaded_file = st.file_uploader("Choose a video file", type=["mp4", "mov", "avi"])
+# Option for selecting between sample files or uploading a file
+option = st.radio("Choose video input method:", ("Sample Files", "Upload Your Own"))
 
-if uploaded_file is not None:
-    # Save uploaded file to a temporary location
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        temp_file.write(uploaded_file.read())
-        temp_file_path = temp_file.name
+temp_file_path = None
 
+if option == "Sample Files":
+    # Sample files to choose from
+    sample_files = ["fire1.mp4", "fire2.mp4"]
+
+    if sample_files:
+        # Select a sample video file
+        selected_file = st.selectbox("Select a sample video file", sample_files,
+                                     index=None)
+
+        if selected_file:
+            # Load selected sample file
+            sample_file_path = os.path.join("sample_data", selected_file)
+            if not os.path.isfile(sample_file_path):
+                st.error("Sample file not found.")
+            else:
+                temp_file_path = sample_file_path
+    else:
+        st.error("No sample files available.")
+
+elif option == "Upload Your Own":
+    # Upload video file
+    uploaded_file = st.file_uploader("Choose a video file", type=["mp4", "mov", "avi"])
+
+    if uploaded_file is not None:
+        # Save uploaded file to a temporary location
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(uploaded_file.read())
+            temp_file_path = temp_file.name
+
+# Run inference if a file path is set
+if temp_file_path:
     # Reading the classes
     classnames = ['fire']
 
@@ -69,7 +95,7 @@ if uploaded_file is not None:
         frame = cv2.resize(frame, (640, 480))
         result = model(frame, stream=True)
 
-        # Getting bbox, confidence and class names information to work with
+        # Getting bbox, confidence, and class names information to work with
         for info in result:
             boxes = info.boxes
             for box in boxes:
