@@ -45,7 +45,7 @@ jobs:
     - name: Retrieve EC2 Public IP
       id: get_ip
       run: |
-        INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=your-instance-name" --query "Reservations[*].Instances[*].InstanceId" --output text)
+        INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=streamlit-server" --query "Reservations[*].Instances[*].InstanceId" --output text)
         PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
         echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
 
