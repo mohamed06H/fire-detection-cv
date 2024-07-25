@@ -29,8 +29,8 @@ Documentation=https://caddyserver.com/docs/
 After=network.target
 
 [Service]
-User=caddy
-Group=caddy
+User=ec2-user
+Group=ec2-user
 ExecStart=/usr/local/bin/caddy run --config /etc/caddy/Caddyfile --resume
 ExecReload=/usr/local/bin/caddy reload --config /etc/caddy/Caddyfile
 Restart=on-abort
