@@ -55,14 +55,16 @@ jobs:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
     - name: Deploy to EC2
+      env:
+        PUBLIC_IP: ${{ env.PUBLIC_IP }}
       run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.PUBLIC_IP }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
           sudo yum update -y
           sudo amazon-linux-extras install docker -y
           sudo service docker start
           sudo usermod -a -G docker ec2-user
           # Pull latest code and deploy using Docker
-          cd /path/to/your/app
+          cd /app
           git pull origin main
           docker build -t streamlit-app .
           docker stop streamlit-app || true
