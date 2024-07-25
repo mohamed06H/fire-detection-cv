@@ -49,6 +49,11 @@ jobs:
         PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
         echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
 
+    - name: Update DuckDNS
+      run: |
+        curl -k "https://www.duckdns.org/update?domains=streamlit-server&token=${{ secrets.DUCKDNS_TOKEN }}&ip=${{ env.PUBLIC_IP }}"
+
+
     - name: Set up SSH for deployment
       uses: webfactory/ssh-agent@v0.5.3
       with:
@@ -64,11 +69,29 @@ jobs:
           sudo systemctl start docker
           sudo usermod -aG docker ec2-user
           sudo systemctl enable docker
-          # Restart Docker to apply group changes
-          sudo systemctl restart docker
+        
+          # Install Caddy
+          sudo curl -fsSL https://caddyserver.com/api/download?os=linux&arch=amd64 | sudo tar xzf - -C /usr/local/bin
+        
+          # Create Caddyfile
+          sudo bash -c 'cat > /etc/caddy/Caddyfile <<EOF
+          streamlit-server.duckdns.org {
+              reverse_proxy localhost:8501
+              log {
+                  output file /var/log/caddy/access.log
+              }
+              tls ${{ secrets.CADDY_EMAIL }}
+          }
+          EOF'
+        
+          # Start Caddy
+          sudo mkdir -p /etc/caddy
+          sudo systemctl start caddy
+          sudo systemctl enable caddy
+        
           # Pull the latest Docker image and deploy
           sudo docker pull mohamed06/wf_streamlit:latest
           sudo docker stop streamlit-app || true
           sudo docker rm streamlit-app || true
-          sudo docker run -d -p 80:8501 --name streamlit-app mohamed06/wf_streamlit:latest
+          sudo docker run -d -p 8501:8501 --name streamlit-app mohamed06/wf_streamlit:latest
         EOF
