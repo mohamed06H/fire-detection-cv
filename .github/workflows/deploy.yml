@@ -56,9 +56,16 @@ jobs:
 
     - name: Deploy to EC2
       run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
-          docker pull mohamed06/wf_streamlit:latest
-          docker stop streamlit_app || true
-          docker rm streamlit_app || true
-          docker run -d -p 8501:8501 --name streamlit_app mohamed06/wf_streamlit:latest
+        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.PUBLIC_IP }} << 'EOF'
+          sudo yum update -y
+          sudo amazon-linux-extras install docker -y
+          sudo service docker start
+          sudo usermod -a -G docker ec2-user
+          # Pull latest code and deploy using Docker
+          cd /path/to/your/app
+          git pull origin main
+          docker build -t streamlit-app .
+          docker stop streamlit-app || true
+          docker rm streamlit-app || true
+          docker run -d -p 80:8501 --name streamlit-app streamlit-app
         EOF
