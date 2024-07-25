@@ -10,6 +10,15 @@ sudo systemctl enable docker
 # Install Caddy
 sudo curl -fsSL https://caddyserver.com/download/linux/amd64 | sudo tar xzf - -C /usr/local/bin
 
+# Ensure the caddy binary is executable
+sudo chmod +x /usr/local/bin/caddy
+
+# Verify the installation
+if [ ! -x /usr/local/bin/caddy ]; then
+  echo "Caddy installation failed!"
+  exit 1
+fi
+
 # Create Caddyfile
 sudo bash -c 'cat > /etc/caddy/Caddyfile' <<EOF
 streamlit-server.duckdns.org {
