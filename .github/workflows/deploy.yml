@@ -63,5 +63,5 @@ jobs:
       env:
         PUBLIC_IP: ${{ env.PUBLIC_IP }}
       run: |
-        scp -o StrictHostKeyChecking=no -i private_key.pem setup.sh ec2-user@${{ env.PUBLIC_IP }}:/home/ec2-user/setup.sh
-        ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ env.PUBLIC_IP }} "bash /home/ec2-user/setup.sh ${{ secrets.CADDY_EMAIL }}"
+        scp -o StrictHostKeyChecking=no -i private_key.pem setup.sh ubuntu@${{ env.PUBLIC_IP }}:/home/ubuntu/setup.sh
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ env.PUBLIC_IP }} "bash /home/ubuntu/setup.sh ${{ secrets.CADDY_EMAIL }}"
