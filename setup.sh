@@ -22,14 +22,19 @@ if [ ! -x /usr/local/bin/caddy ]; then
   exit 1
 fi
 
+# Create a dedicated user for Caddy
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin caddy
+
+# Create necessary directories and set permissions
+sudo mkdir -p /etc/caddy
+sudo mkdir -p /var/lib/caddy
+sudo chown -R caddy:caddy /etc/caddy
+sudo chown -R caddy:caddy /var/lib/caddy
+
 # Create Caddyfile
 sudo bash -c 'cat > /etc/caddy/Caddyfile' <<EOF
 streamlit-server.duckdns.org {
     reverse_proxy localhost:8501
-    log {
-        output file /var/log/caddy/access.log
-    }
-    tls ${1}
 }
 EOF
 
@@ -41,11 +46,15 @@ Documentation=https://caddyserver.com/docs/
 After=network.target
 
 [Service]
-User=ec2-user
-Group=ec2-user
+User=caddy
+Group=caddy
 ExecStart=/usr/local/bin/caddy run --config /etc/caddy/Caddyfile --resume
 ExecReload=/usr/local/bin/caddy reload --config /etc/caddy/Caddyfile
 Restart=on-abort
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+ProtectSystem=full
+ProtectHome=yes
+NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target
