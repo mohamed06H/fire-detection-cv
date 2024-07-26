@@ -22,11 +22,23 @@ if [ ! -x /usr/local/bin/caddy ]; then
   exit 1
 fi
 
-# Create Caddyfile
-sudo bash -c 'cat > /etc/caddy/Caddyfile' <<EOF
-streamlit-server.duckdns.org {
-    reverse_proxy localhost:8501
-}
+# Create and start Caddy service
+sudo bash -c 'cat > /etc/systemd/system/caddy.service' <<EOF
+[Unit]
+Description=Caddy Reverse Proxy for Streamlit Server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/caddy reverse-proxy --streamlit-server.duckdns.org --to :8501
+Restart=always
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/caddy
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
