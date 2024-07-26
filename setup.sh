@@ -22,6 +22,33 @@ if [ ! -x /usr/local/bin/caddy ]; then
   exit 1
 fi
 
+sudo mkdir -p /etc/caddy
+sudo mkdir -p /var/log/caddy/
+sudo chown -R /etc/caddy
+sudo chown -R /var/log/caddy/
+
+# Create Caddyfile
+sudo bash -c 'cat > /etc/caddy/Caddyfile' <<EOF
+# This is the domain that Caddy will use to generate a TLS certificate
+streamlit-server.duckdns.org {
+
+    # Enable automatic HTTPS
+    tls m.hamiche99@gmail.com
+
+    # Reverse proxy configuration
+    reverse_proxy localhost:8501
+
+    # Optional: define additional settings if needed
+    # For example, to add a health check
+    # health_check /health
+
+    # Optional: enable logging
+    log {
+        output file /var/log/caddy/access.log
+    }
+}
+EOF
+
 # Create and start Caddy service
 sudo bash -c 'cat > /etc/systemd/system/caddy.service' <<EOF
 [Unit]
@@ -29,11 +56,14 @@ Description=Caddy Reverse Proxy for Streamlit Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/caddy reverse-proxy --streamlit-server.duckdns.org --to :8501
+ExecStart=sudo /usr/local/bin/caddy run --environ --config /etc/caddy/Caddyfile
+ExecReload=sudo /usr/bin/caddy reload --config /etc/caddy/Caddyfile --force
+TimeoutStopSec=5s
 Restart=always
+RestartSec=3
 User=ubuntu
 Group=ubuntu
-WorkingDirectory=/home/caddy
+WorkingDirectory=/home/ubuntu
 StandardOutput=journal
 StandardError=journal
 
