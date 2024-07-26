@@ -22,25 +22,12 @@ if [ ! -x /usr/local/bin/caddy ]; then
   exit 1
 fi
 
-# Create a dedicated user for Caddy
-sudo useradd --system --no-create-home --shell /usr/sbin/nologin caddy
-
-# Create necessary directories and set permissions
-sudo mkdir -p /etc/caddy
-sudo mkdir -p /var/lib/caddy/.config/caddy
-sudo chown -R caddy:caddy /etc/caddy
-sudo chown -R caddy:caddy /var/lib/caddy
-
 # Create Caddyfile
 sudo bash -c 'cat > /etc/caddy/Caddyfile' <<EOF
 streamlit-server.duckdns.org {
     reverse_proxy localhost:8501
 }
 EOF
-
-sudo systemctl restart caddy
-sudo systemctl enable caddy
-
 
 sudo systemctl daemon-reload
 sudo systemctl start caddy
