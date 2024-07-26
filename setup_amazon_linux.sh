@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Update and install Docker
-sudo apt update -y
-sudo apt install -y docker.io
+sudo yum update -y
+sudo yum install -y docker
 sudo systemctl start docker
-sudo usermod -aG docker $USER
+sudo usermod -aG docker ec2-user
 sudo systemctl enable docker
 
 # Install Caddy
@@ -26,10 +26,10 @@ fi
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin caddy
 
 # Create necessary directories and set permissions
-sudo mkdir -p /etc/caddy
-sudo mkdir -p /var/lib/caddy/.config/caddy
 sudo chown -R caddy:caddy /etc/caddy
+sudo mkdir -p /var/lib/caddy/.config/caddy
 sudo chown -R caddy:caddy /var/lib/caddy
+
 
 # Create Caddyfile
 sudo bash -c 'cat > /etc/caddy/Caddyfile' <<EOF
