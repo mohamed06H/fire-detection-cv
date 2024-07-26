@@ -38,27 +38,9 @@ streamlit-server.duckdns.org {
 }
 EOF
 
-# Create and start Caddy service
-sudo bash -c 'cat > /etc/systemd/system/caddy.service' <<EOF
-[Unit]
-Description=Caddy v2 web server
-Documentation=https://caddyserver.com/docs/
-After=network.target
+sudo systemctl restart caddy
+sudo systemctl enable caddy
 
-[Service]
-User=caddy
-Group=caddy
-ExecStart=/usr/local/bin/caddy run --config /etc/caddy/Caddyfile --resume
-ExecReload=/usr/local/bin/caddy reload --config /etc/caddy/Caddyfile
-Restart=on-abort
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-ProtectSystem=full
-ProtectHome=yes
-NoNewPrivileges=true
-
-[Install]
-WantedBy=multi-user.target
-EOF
 
 sudo systemctl daemon-reload
 sudo systemctl start caddy
