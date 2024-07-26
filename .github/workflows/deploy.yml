@@ -59,39 +59,9 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    - name: Deploy to EC2
+    - name: Copy and execute setup script on EC2
       env:
         PUBLIC_IP: ${{ env.PUBLIC_IP }}
       run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ env.PUBLIC_IP }} << 'EOF'
-          sudo yum update -y
-          sudo yum install -y docker
-          sudo systemctl start docker
-          sudo usermod -aG docker ec2-user
-          sudo systemctl enable docker
-        
-          # Install Caddy
-          sudo curl -fsSL https://caddyserver.com/api/download?os=linux&arch=amd64 | sudo tar xzf - -C /usr/local/bin
-        
-          # Create Caddyfile
-          sudo bash -c 'cat > /etc/caddy/Caddyfile <<EOF
-          streamlit-server.duckdns.org {
-              reverse_proxy localhost:8501
-              log {
-                  output file /var/log/caddy/access.log
-              }
-              tls ${{ secrets.CADDY_EMAIL }}
-          }
-          EOF'
-        
-          # Start Caddy
-          sudo mkdir -p /etc/caddy
-          sudo systemctl start caddy
-          sudo systemctl enable caddy
-        
-          # Pull the latest Docker image and deploy
-          sudo docker pull mohamed06/wf_streamlit:latest
-          sudo docker stop streamlit-app || true
-          sudo docker rm streamlit-app || true
-          sudo docker run -d -p 8501:8501 --name streamlit-app mohamed06/wf_streamlit:latest
-        EOF
+        scp -o StrictHostKeyChecking=no -i private_key.pem setup.sh ubuntu@${{ env.PUBLIC_IP }}:/home/ubuntu/setup.sh
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ env.PUBLIC_IP }} "bash /home/ubuntu/setup.sh ${{ secrets.CADDY_EMAIL }}"
