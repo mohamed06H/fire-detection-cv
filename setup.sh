@@ -8,9 +8,12 @@ sudo usermod -aG docker ec2-user
 sudo systemctl enable docker
 
 # Install Caddy
-sudo curl -fsSL https://caddyserver.com/download/linux/amd64 | sudo tar xzf - -C /usr/local/bin
+# Fetch the latest release version from GitHub
+LATEST_RELEASE=$(curl -s https://api.github.com/repos/caddyserver/caddy/releases/latest | grep 'tag_name' | cut -d\" -f4)
+CADDY_URL="https://github.com/caddyserver/caddy/releases/download/${LATEST_RELEASE}/caddy_${LATEST_RELEASE#v}_linux_amd64.tar.gz"
 
-# Ensure the caddy binary is executable
+# Download and install Caddy
+curl -fsSL $CADDY_URL | sudo tar xzf - -C /usr/local/bin
 sudo chmod +x /usr/local/bin/caddy
 
 # Verify the installation
