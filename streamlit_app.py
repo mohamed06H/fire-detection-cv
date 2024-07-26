@@ -40,7 +40,7 @@ model_name = 'fire_detection_yolo'
 model = load_model(model_name)
 
 # Title of the Streamlit app
-st.title("Fire Detection using YOLO")
+st.title("Fire Detection using YOLOv8")
 
 # Option for selecting between sample files or uploading a file
 option = st.radio("Choose video input method:", ("Sample Files", "Upload Your Own"))
