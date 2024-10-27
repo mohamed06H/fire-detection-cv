@@ -1,4 +1,4 @@
-# Fire Detection using YOLOv8
+# Fire Detection Computer Vision
 This repository contains the results of our experiment on Aerial images fire detection, a report is available under /best_experiment.
 
 [Link to study and datasets](https://ieee-dataport.org/open-access/flame-dataset-aerial-imagery-pile-burn-detection-using-drones-uavs)
@@ -9,7 +9,7 @@ This repository also contains a Streamlit application that performs fire detecti
 For the aim of simplifying things, the best model was downloaded manually from MLFlow to /models/best_model_fire.pt, more automation with CI/CD was done in (amazon_linux) branch.
 
 ## Table of Contents
-- [Fire Detection using YOLOv8](#fire-detection-using-yolov8)
+- [Fire Detection Computer Vision](#fire-detection-computer-vision)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [Installation](#installation)
