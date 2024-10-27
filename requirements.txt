@@ -1,4 +1,4 @@
-ultralytics==8.0.25
+ultralytics
 streamlit
 cvzone
 opencv-python-headless

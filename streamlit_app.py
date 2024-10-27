@@ -20,13 +20,13 @@ def load_model(local_model_path):
     return model
 
 # Path to the local YOLO model file
-local_model_path = 'models/fire_yolo.pt'
+local_model_path = 'models/best_model_fire.pt'
 
 # Load the YOLO model
 model = load_model(local_model_path)
 
 # Title of the Streamlit app
-st.title("Fire Detection using YOLOv8")
+st.title("Fire Detection using Drone images")
 
 # Option for selecting between sample files or uploading a file
 option = st.radio("Choose video input method:", ("Sample Files", "Upload Your Own"))
