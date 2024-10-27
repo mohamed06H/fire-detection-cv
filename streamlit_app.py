@@ -3,44 +3,30 @@ from ultralytics import YOLO
 import cvzone
 import cv2
 import math
-import tempfile
-import mlflow
 import os
+import tempfile
 
-# Set the MLflow tracking URI to the remote server
-mlflow.set_tracking_uri("https://mlflow-server.duckdns.org/")
+# Function to load the YOLO model from a local file
+# Lazy-load the YOLO model
+@st.cache_resource
+def load_model(local_model_path):
+    # Ensure the file exists before trying to load it
+    if not os.path.exists(local_model_path):
+        raise FileNotFoundError(f"Model file not found at {local_model_path}")
 
+    # Load the model using Ultralytics
+    model = YOLO(local_model_path)
 
-# Function to load the YOLO model from MLflow
-def load_model(model_name, stage='Production'):
-    # Get the model URI
-    model_uri = f"models:/{model_name}/{stage}"
+    return model
 
-    # Create a temporary directory
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Download the specific artifact from MLflow
-        artifact_path = 'fire_yolo.pt'
-        model_path = mlflow.artifacts.download_artifacts(model_uri, dst_path=temp_dir)
-
-        # Construct the full path to the downloaded model
-        full_model_path = os.path.join(model_path, artifact_path)
-
-        # Ensure the file exists before trying to load it
-        if not os.path.exists(full_model_path):
-            raise FileNotFoundError(f"Model file not found at {full_model_path}")
-
-        # Load the model using Ultralytics
-        model = YOLO(full_model_path)
-
-        return model
-
+# Path to the local YOLO model file
+local_model_path = 'models/best_model_fire.pt'
 
 # Load the YOLO model
-model_name = 'fire_detection_yolo'
-model = load_model(model_name)
+model = load_model(local_model_path)
 
 # Title of the Streamlit app
-st.title("Fire Detection using YOLOv8")
+st.title("Fire Detection using Drone images")
 
 # Option for selecting between sample files or uploading a file
 option = st.radio("Choose video input method:", ("Sample Files", "Upload Your Own"))

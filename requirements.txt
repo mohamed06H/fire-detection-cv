@@ -1,5 +1,4 @@
-mlflow
-ultralytics==8.0.0
+ultralytics
 streamlit
 cvzone
 opencv-python-headless
