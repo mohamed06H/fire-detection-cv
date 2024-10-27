@@ -25,8 +25,7 @@ For the aim of simplifying things, the best model was downloaded manually from M
     - [Run Docker Container](#run-docker-container)
     - [Application Structure](#application-structure)
     - [Model Information](#model-information)
-  - [Contributing](#contributing)
-    - [Steps to Contribute](#steps-to-contribute)
+    - [Deployement on AWS](#deployement-on-aws)
 
 ## Features
 
@@ -117,16 +116,13 @@ The application will be accessible at http://localhost:8501.
 - sample_data/: Directory containing sample video files for testing.
 
 ### Model Information
-The model used in this project is a pre-trained YOLOv8 model, specifically trained for fire detection. Ensure the model file (fire_yolo.pt) is placed in the models/ directory.
+The model used in this project is a pre-trained YOLOv8 model, specifically trained for fire detection. Ensure the model file (best_model_fire.pt) is placed in the models/ directory.
 
-## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request or open an Issue if you encounter any problems.
+### Deployement on AWS
+Previously deployed on Free Tier AWS resources, code and CI/CD available in (amazon_linux) feature branch.
 
-### Steps to Contribute
-- Fork the repository.
-- Create a new branch: git checkout -b feature-name
-- Make your changes.
-- Commit your changes: git commit -m 'Add some feature'
-- Push to the branch: git push origin feature-name
-- Submit a pull request.
+![MLOPS app](img/app.png)
+![MLOPS pipeline](img/diagram.png)
+![MLOPS architecture](img/deployment.png)
+
 
