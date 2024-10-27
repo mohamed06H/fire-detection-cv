@@ -1,6 +1,12 @@
 # Fire Detection using YOLOv8
+This repository contains the results of our experiment on Aerial images fire detection, a report is available under /best_experiment.
 
-This repository contains a Streamlit application that performs fire detection on videos using a pre-trained YOLOv8 model. The application can load the model from a local file and perform inference on sample or user-uploaded videos.
+[Link to study and datasets](https://ieee-dataport.org/open-access/flame-dataset-aerial-imagery-pile-burn-detection-using-drones-uavs)
+
+
+This repository also contains a Streamlit application that performs fire detection on videos using a pre-trained YOLOv8 model. The application can load the model from a local file and perform inference on sample or user-uploaded videos.
+
+For the aim of simplifying things, the best model was downloaded manually from MLFlow to /models/best_model_fire.pt, more automation with CI/CD was done in (amazon_linux) branch.
 
 ## Table of Contents
 - [Fire Detection using YOLOv8](#fire-detection-using-yolov8)
@@ -59,8 +65,13 @@ fire-detection-yolov8/
 ├── sample_data/
 │   ├── fire1.mp4              # Sample video file 1
 │   └── fire2.mp4              # Sample video file 2
+├── best_experiment/           # Dockerfile for containerizing the app
+│   ├── azureml_run_dl_...py   # Experiment notebook with both train and testing phases
+│   └── save_at_36.h5          # best model downloaded from AzureML
 ├── streamlit_app.py           # Main Streamlit application
 ├── Dockerfile                 # Dockerfile for containerizing the app
+├── fire_detection_yolo.ipyng  # Collab notebook for fine-tunning the pre-trained yolo model
+├── project_report.docx        # Experiment report on Tensorflow and AzureML
 ├── requirements.txt           # Python dependencies
 └── README.md                  # This README file
 ```
