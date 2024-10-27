@@ -1,6 +1,10 @@
 
 import os
 import os.path
+
+# Flag to enable or disable experiment logging
+enable_experiment_logging = True
+
 print("Current env:", os.getenv('CONDA_DEFAULT_ENV'))
 ## create an experiment in the workspace
 
@@ -14,12 +18,13 @@ from plotdata import plot_training
 from config import Config_classification
 
 from azureml.core import Workspace, Experiment
-ws = Workspace.from_config()
-experiment = Experiment(workspace=ws,
+
+
+if enable_experiment_logging:
+    ws = Workspace.from_config()
+    experiment = Experiment(workspace=ws,
                         name = 'dl-repro')
-
-
-run = experiment.start_logging()
+    run = experiment.start_logging()
 
 
 
@@ -30,12 +35,17 @@ data_augmentation = keras.Sequential([
 
 
 image_size = (new_size.get('width'), new_size.get('height'))
-run.log('image_size',image_size)
+
 batch_size = Config_classification.get('batch_size')
-run.log('batch_size' , batch_size)
+
 save_model_flag = Config_classification.get('Save_Model')
 epochs = Config_classification.get('Epochs')
-run.log('Epochs' , epochs)
+
+
+if enable_experiment_logging:
+    run.log('image_size',image_size)
+    run.log('batch_size' , batch_size)
+    run.log('Epochs' , epochs)
 
 METRICS = [
     keras.metrics.TruePositives(name='tp'),
@@ -84,7 +94,9 @@ for images, labels in train_ds.take(1):  # Assuming `train_ds` is the dataset
         plt.title(f"Label: {int(labels[i])}")
         plt.axis('off')
 plt.savefig("train_ds_images_glimpse.png")
-run.log_image('train_ds images glimpse',
+
+if enable_experiment_logging:
+    run.log_image('train_ds images glimpse',
               path = 'train_ds_images_glimpse.png')
 
 
@@ -134,7 +146,8 @@ model = keras.Model(inputs, outputs, name="model_fire")
 
 # Visualize the model architecture
 keras.utils.plot_model(model, show_shapes=False,to_file="model_architecture.png")
-run.log_image("Model Architecture",path = "model_architecture.png")
+if enable_experiment_logging:
+    run.log_image("Model Architecture",path = "model_architecture.png")
 
 callbacks = [keras.callbacks.ModelCheckpoint("save_at_{epoch}.h5")]
 
@@ -142,12 +155,14 @@ optimizer = keras.optimizers.Adam(learning_rate=0.001)
 model.compile(optimizer=optimizer, 
               loss="binary_crossentropy", 
               metrics=METRICS)
-run.log('Learning Rate',0.001)
+if enable_experiment_logging:
+    run.log('Learning Rate',0.001)
 
 history = model.fit(train_ds, epochs=epochs, callbacks=callbacks, validation_data=val_ds, verbose=1)
 
 # Log Loss and Accuracy for each epoch (training and validation)
-for epoch in range(epochs):
+if enable_experiment_logging:
+ for epoch in range(epochs):
     run.log('Training Loss', history.history['loss'][epoch])
     run.log('Training Accuracy', history.history['bin_accuracy'][epoch])
     
@@ -161,7 +176,8 @@ model.save(file_model_fire)
 
 file_model_fire_azure = 'outputs/'
 model.save(file_model_fire_azure)
-run.upload_file(name = 'model_repro.pb',path_or_stream='outputs/saved_model.pb')
+if enable_experiment_logging:
+    run.upload_file(name = 'model_repro.pb',path_or_stream='outputs/saved_model.pb')
 
 
 """
@@ -169,9 +185,10 @@ run.upload_file(name = 'model_repro.pb',path_or_stream='outputs/saved_model.pb')
  Classification after training the Model, modules and methods in this file evaluate the performance of the trained
  model over the test dataset
  Test Data: Item (8) on https://ieee-dataport.org/open-access/flame-dataset-aerial-imagery-pile-burn-detection-using-drones-uavs 
- Tensorflow Version: 2.3.0
- GPU: Nvidia RTX 2080 Ti
- OS: Ubuntu 18.04
+ Tensorflow Version: 2.10.0
+ GPU: Nvidia RTX 3060
+ OS: windows11
+ CUDA: V11.2.152
 ################################
 """
 #########################################################
@@ -207,8 +224,9 @@ results_eval = best_model_fire.evaluate(test_ds, batch_size=batch_size)
 
 # Evaluate the model and extract confusion matrix elements
 results_eval = best_model_fire.evaluate(test_ds, batch_size=batch_size)
-run.log('loss_best_model',results_eval[0])
-run.log('accuracy_best_model',results_eval[1])
+if enable_experiment_logging:
+    run.log('loss_best_model',results_eval[0])
+    run.log('accuracy_best_model',results_eval[1])
 
 # Extract the individual confusion matrix elements (True Positives, False Positives, True Negatives, False Negatives)
 tp = _[1]
@@ -217,7 +235,8 @@ tn = _[3]
 fn = _[4]
 
 # Log the confusion matrix as a table
-run.log_table('Confusion Matrix', {
+if enable_experiment_logging:
+ run.log_table('Confusion Matrix', {
     ' ': ['Actual No Fire', 'Actual Fire'],  # Row headers
     'Predicted No Fire': [tn, fn],           # True Negatives, False Negatives
     'Predicted Fire': [fp, tp]               # False Positives, True Positives
@@ -238,15 +257,16 @@ validation_accuracy = history.history['val_bin_accuracy'][-1]
 
 
 # Log the table with Loss and Accuracy for Training, Validation, and Test sets
-run.log_table("Performance", {
+if enable_experiment_logging:
+ run.log_table("Performance", {
     "Dataset": ["Training", "Validation", "Test"],
     "Loss": [training_loss, validation_loss, results_eval[0]],
     "Accuracy": [training_accuracy, validation_accuracy, results_eval[1]]
 })
 
 
-
-run.complete()
+if enable_experiment_logging:
+    run.complete()
 
 
 print("Experiment finished and logged successfully")
